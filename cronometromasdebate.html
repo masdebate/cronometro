@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cronómetro de Debate</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: white;
+            text-align: center;
+        }
+        .header img {
+            width: 100%;
+            max-height: 300px;
+            object-fit: contain;
+        }
+        .timer {
+            font-size: 20rem;
+            margin: 40px 0;
+        }
+        .timer.negative {
+            color: red;
+        }
+        .description {
+            font-size: 2rem;
+            margin-top: 30px;
+            margin-bottom: 30px;
+        }
+        .buttons {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        .buttons-row {
+            margin: 10px 0;
+        }
+        button {
+            background-color: #1961b6;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            font-size: 1rem;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+        button:hover {
+            background-color: #154a8a;
+        }
+        .input-group {
+            margin-top: 20px;
+        }
+        .input-group input {
+            padding: 5px;
+            font-size: 1rem;
+            width: 100px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+      <img src="C:\Users\SAUL\Desktop\image.PNG" alt="Logo del Torneo">
+    </div>
+
+    <div class="buttons">
+        <div class="buttons-row">
+            <button onclick="setPredefinedTime(240, 'EXPOSICIÓN INICIAL A FAVOR', 0)">EI AF</button>
+            <button onclick="setPredefinedTime(240, 'EXPOSICIÓN INICIAL EN CONTRA', 1)">EI EC</button>
+            <button onclick="setPredefinedTime(240, 'PRIMERA REFUTACIÓN A FAVOR', 2)">R1 AF</button>
+            <button onclick="setPredefinedTime(240, 'PRIMERA REFUTACIÓN EN CONTRA', 3)">R1 EC</button>
+        </div>
+        <div class="buttons-row">
+            <button onclick="setPredefinedTime(240, 'SEGUNDA REFUTACIÓN A FAVOR', 4)">R2 AF</button>
+            <button onclick="setPredefinedTime(240, 'SEGUNDA REFUTACIÓN EN CONTRA', 5)">R2 EC</button>
+            <button onclick="setPredefinedTime(180, 'CONCLUSIÓN A FAVOR', 6)">CO AF</button>
+            <button onclick="setPredefinedTime(180, 'CONCLUSIÓN EN CONTRA', 7)">CO EC</button>
+        </div>
+    </div>
+
+    <div class="description" id="description">EXPOSICIÓN INICIAL A FAVOR</div>
+
+    <div class="timer" id="timer">04:00</div>
+
+    <div class="buttons">
+        <button onclick="startTimer()">INICIAR</button>
+        <button onclick="pauseTimer()">PAUSAR</button>
+        <button onclick="advanceToNext()">FINALIZAR</button>
+        <div class="input-group">
+            <input type="number" id="customTime" placeholder="Segundos">
+            <button onclick="setCustomTime()">REINICIAR</button>
+        </div>
+    </div>
+
+    <script>
+        let timerInterval;
+        let timeLeft = 240;
+        let running = false;
+        let currentIndex = 0;
+
+        const timerDisplay = document.getElementById('timer');
+        const descriptionDisplay = document.getElementById('description');
+
+        const predefinedTimes = [
+            { time: 240, description: 'EXPOSICIÓN INICIAL A FAVOR' },
+            { time: 240, description: 'EXPOSICIÓN INICIAL EN CONTRA' },
+            { time: 240, description: 'PRIMERA REFUTACIÓN A FAVOR' },
+            { time: 240, description: 'PRIMERA REFUTACIÓN EN CONTRA' },
+            { time: 240, description: 'SEGUNDA REFUTACIÓN A FAVOR' },
+            { time: 240, description: 'SEGUNDA REFUTACIÓN EN CONTRA' },
+            { time: 180, description: 'CONCLUSIÓN A FAVOR' },
+            { time: 180, description: 'CONCLUSIÓN EN CONTRA' }
+        ];
+
+        function updateTimerDisplay() {
+            const minutes = Math.floor(Math.abs(timeLeft) / 60);
+            const seconds = Math.abs(timeLeft) % 60;
+            const sign = timeLeft < 0 ? '-' : '';
+
+            timerDisplay.textContent = `${sign}${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+            timerDisplay.classList.toggle('negative', timeLeft < 0);
+        }
+
+        function setPredefinedTime(seconds, description, index) {
+            running = false;
+            clearInterval(timerInterval);
+            timeLeft = seconds;
+            currentIndex = index;
+            descriptionDisplay.textContent = description;
+            updateTimerDisplay();
+        }
+
+        function startTimer() {
+            if (!running) {
+                running = true;
+                timerInterval = setInterval(() => {
+                    timeLeft--;
+                    updateTimerDisplay();
+                }, 1000);
+            }
+        }
+
+        function pauseTimer() {
+            running = false;
+            clearInterval(timerInterval);
+        }
+
+        function advanceToNext() {
+            running = false;
+            clearInterval(timerInterval);
+            currentIndex = (currentIndex + 1) % predefinedTimes.length;
+            const next = predefinedTimes[currentIndex];
+            timeLeft = next.time;
+            descriptionDisplay.textContent = next.description;
+            updateTimerDisplay();
+        }
+
+        function setCustomTime() {
+            const customTime = parseInt(document.getElementById('customTime').value, 10);
+            if (!isNaN(customTime)) {
+                timeLeft = customTime;
+                updateTimerDisplay();
+            } else {
+                alert("Por favor, introduce un número válido.");
+            }
+        }
+
+        updateTimerDisplay();
+    </script>
+</body>
+</html>
